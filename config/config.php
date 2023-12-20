@@ -6,7 +6,8 @@ return [
         'types' => [
             'embed' => 'Nhúng',
             'mp4' => 'MP4',
-            'm3u8' => 'M3U8'
+            'm3u8' => 'M3U8',
+            'local' => 'Upload',
         ]
     ],
     'ckfinder' => [

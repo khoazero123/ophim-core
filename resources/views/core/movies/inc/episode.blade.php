@@ -96,7 +96,7 @@ $episodes = collect(old('episodes', isset($entry) ? $entry->episodes : []));
                                                 class="form-control" data-attr-name="slug"></td>
                                         <td>
                                             <select name="episodes[{{ $index }}][type]"
-                                                data-attr-name="type" class="form-control">
+                                                data-attr-name="type" class="form-control episode-type" data-index="{{ $index }}">
                                                 @foreach (config('ophim.episodes.types', []) as $key => $name)
                                                     <option value="{{ $key }}"
                                                         @if (($episode['type'] ?? $episode->type) == $key) selected @endif>
@@ -167,7 +167,7 @@ $episodes = collect(old('episodes', isset($entry) ? $entry->episodes : []));
                                     <td><input type="text" name="episodes[0][slug]" placeholder="tap-1"
                                             value="tap-1" class="form-control" data-attr-name="slug"></td>
                                     <td>
-                                        <select name="episodes[0][type]" data-attr-name="type" class="form-control">
+                                        <select name="episodes[0][type]" data-attr-name="type" class="form-control episode-type" data-index="0">
                                             @foreach (config('ophim.episodes.types', []) as $key => $name)
                                                 <option value="{{ $key }}">
                                                     {{ $name }}</option>
@@ -279,7 +279,7 @@ $episodes = collect(old('episodes', isset($entry) ? $entry->episodes : []));
                     <td><input type="text" placeholder="${slug || 'tap-1'}" value="${slug || 'tap-1'}"
                             class="form-control" data-attr-name="slug"></td>
                     <td>
-                        <select data-attr-name="type" class="form-control">
+                        <select data-attr-name="type" class="form-control episode-type" data-index="${i}">
                             @foreach (config('ophim.episodes.types', []) as $key => $name)
                                 <option value="{{ $key }}" ${'{{$key}}' == type ? 'selected' : ''}>{{ $name }}</option>
                             @endforeach
@@ -302,7 +302,31 @@ $episodes = collect(old('episodes', isset($entry) ? $entry->episodes : []));
     $(document).on('click', '.delete-episode', function(e) {
         $(this).closest('tr').remove();
         updateNameAttr();
-    })
+    });
+
+    $(document).on('change', '.episode-type', function() {
+        const index = $(this).data('index');
+        const value = $(this).val();
+
+        if (value == 'local') {
+            changeInputToFile(index);
+        } else {
+            changeInputToText(index);
+        }
+    });
+
+    function changeInputToFile(index) {
+        const el = $(`input[name="episodes[${index}][link]"]`);
+        $(el).attr('type', 'file');
+        $(el).attr('accept', 'video/*');
+        $(el).removeAttr('value');
+    }
+
+    function changeInputToText(index) {
+        const el = $(`input[name="episodes[${index}][link]"]`);
+        $(el).attr('type', 'text');
+        $(el).removeAttr('accept');
+    }
 
     function updateEpisodeServer(el) {
         $($(el).attr('href')).find('.episode-server').val($(el).html().trim());
